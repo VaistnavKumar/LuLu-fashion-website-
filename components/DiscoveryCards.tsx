@@ -1,142 +1,202 @@
 
 import React, { useRef, useState } from 'react';
-import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
-import { Mountain, Users, Camera, Plus } from 'lucide-react';
+import { motion, useScroll, useTransform, useSpring, AnimatePresence } from 'framer-motion';
 
 const DiscoveryCards: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    offset: ["start end", "end start"]
+    offset: ["start start", "end end"]
   });
 
-  const xLeft = useTransform(scrollYProgress, [0.1, 0.4, 0.6, 0.9], [0, -280, -280, 0]);
-  const rotateLeft = useTransform(scrollYProgress, [0.1, 0.4, 0.6, 0.9], [0, -12, -12, 0]);
-  const opacityLeft = useTransform(scrollYProgress, [0.0, 0.2, 0.8, 1.0], [0, 1, 1, 0]);
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001
+  });
 
-  const xRight = useTransform(scrollYProgress, [0.1, 0.4, 0.6, 0.9], [0, 280, 280, 0]);
-  const rotateRight = useTransform(scrollYProgress, [0.1, 0.4, 0.6, 0.9], [0, 12, 12, 0]);
-  const opacityRight = useTransform(scrollYProgress, [0.0, 0.2, 0.8, 1.0], [0, 1, 1, 0]);
-
-  const centerScale = useTransform(scrollYProgress, [0.1, 0.4, 0.6, 0.9], [1, 1.1, 1.1, 1]);
-  const centerOpacity = useTransform(scrollYProgress, [0.0, 0.1, 0.9, 1.0], [0, 1, 1, 0]);
+  const cards = [
+    {
+      id: 1,
+      title: "MONOLITH",
+      subtitle: "ARCHIVE STUDY 01",
+      description: "A PURE FORM OF ARCHITECTURAL SILENCE",
+      img: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=1200&auto=format&fit=crop",
+      range: [0, 0.33]
+    },
+    {
+      id: 2,
+      title: "KINETIC",
+      subtitle: "ARCHIVE STUDY 02",
+      description: "ENGINEERED FOR FLUID HUMAN MOTION",
+      img: "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?q=80&w=1200&auto=format&fit=crop",
+      range: [0.33, 0.66]
+    },
+    {
+      id: 3,
+      title: "VOID",
+      subtitle: "ARCHIVE STUDY 03",
+      description: "THE SPACE BETWEEN FABRIC AND SKIN",
+      img: "https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&w=1200&auto=format&fit=crop",
+      range: [0.66, 1]
+    }
+  ];
 
   return (
     <section 
       ref={containerRef}
-      className="relative w-full py-40 bg-white overflow-hidden flex flex-col items-center justify-center min-h-[120vh]"
+      className="relative w-full bg-white h-[450vh]"
     >
-      <div className="text-center mb-16 px-6 relative z-40">
-        <motion.span 
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          className="text-[10px] font-bold tracking-[0.4em] text-zinc-400 uppercase"
-        >
-          Interactive Archive
-        </motion.span>
-        <motion.h2 
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="text-5xl md:text-7xl font-black tracking-tighter mt-4"
-        >
-          EXPLORE THE EDIT
-        </motion.h2>
-        <p className="text-zinc-400 text-xs font-bold tracking-widest mt-4 uppercase">Hover or touch to reveal details</p>
+      <div className="sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center px-4 md:px-12">
+        <div className="relative w-full max-w-7xl h-full flex items-center justify-center gap-4 md:gap-8 lg:gap-12">
+          {cards.map((card, index) => (
+            <IndividualCard 
+              key={card.id} 
+              card={card} 
+              index={index} 
+              progress={smoothProgress} 
+            />
+          ))}
+        </div>
       </div>
-
-      <div 
-        className="sticky top-1/2 -translate-y-1/2 flex items-center justify-center w-full h-[600px]"
-        style={{ perspective: '1200px' }}
-      >
-        <CardItem 
-          style={{ x: xLeft, rotateZ: rotateLeft, opacity: opacityLeft, zIndex: 1 }}
-          img="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=800&auto=format&fit=crop"
-          title="BRUTALIST VEST"
-          subtitle="CAMPAIGN 01"
-          description="A study in raw concrete textures and structured wool."
-          icon={<Mountain className="h-3 w-3" />}
-        />
-
-        <CardItem 
-          style={{ scale: centerScale, opacity: centerOpacity, zIndex: 3 }}
-          img="https://images.unsplash.com/photo-1539109136881-3be0616acf4b?q=80&w=800&auto=format&fit=crop"
-          title="MONOLITH COAT"
-          subtitle="PERSONA"
-          description="Oversized silhouette with hidden technical fasteners."
-          icon={<Users className="h-3 w-3" />}
-        />
-
-        <CardItem 
-          style={{ x: xRight, rotateZ: rotateRight, opacity: opacityRight, zIndex: 2 }}
-          img="https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&w=800&auto=format&fit=crop"
-          title="URBAN VOID"
-          subtitle="EDIT FW24"
-          description="Symmetry breaking through innovative seam construction."
-          icon={<Camera className="h-3 w-3" />}
-        />
-      </div>
-      
-      {/* Reduced spacer to prevent 'blank' scrolling feel */}
-      <div className="h-[20vh]" />
     </section>
   );
 };
 
-const CardItem = ({ style, img, title, subtitle, description, icon }: any) => {
+interface CardProps {
+  card: {
+    id: number;
+    title: string;
+    subtitle: string;
+    description: string;
+    img: string;
+    range: number[];
+  };
+  index: number;
+  progress: any;
+}
+
+const IndividualCard: React.FC<CardProps> = ({ card, progress }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [start, end] = card.range;
+  const mid = (start + end) / 2;
+
+  // Scroll-linked layout transforms
+  const width = useTransform(progress, [start, mid, end], ["28%", "50%", "28%"]);
+  const height = useTransform(progress, [start, mid, end], ["60%", "85%", "60%"]);
+  const zIndex = useTransform(progress, [start, mid, end], [10, 50, 10]);
+
+  // Base image filters (Grayscale + Dimmed)
+  const grayscale = useTransform(progress, [start, mid, end], ["100%", "80%", "100%"]);
+  const brightness = useTransform(progress, [start, mid, end], ["0.3", "0.5", "0.3"]);
 
   return (
     <motion.div
-      style={style}
+      style={{
+        width,
+        height,
+        zIndex,
+      }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onTouchStart={() => setIsHovered(true)}
-      className="absolute w-64 sm:w-80 aspect-[3/4] rounded-2xl bg-neutral-900 ring-1 ring-white/10 overflow-hidden shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] cursor-pointer group"
+      onTouchEnd={() => setIsHovered(false)}
+      className="relative flex-shrink-0 rounded-sm overflow-hidden bg-zinc-950 transition-all duration-500 ease-out cursor-pointer group"
     >
-      <motion.img 
-        alt={title} 
-        animate={{ scale: isHovered ? 1.1 : 1, filter: isHovered ? 'grayscale(0%)' : 'grayscale(100%)' }}
-        className="absolute inset-0 w-full h-full object-cover transition-all duration-700" 
-        src={img} 
+      {/* Background Image Container */}
+      <motion.div 
+        className="absolute inset-0 w-full h-full"
+        animate={{
+          scale: isHovered ? 1.1 : 1,
+          filter: isHovered 
+            ? "grayscale(0%) brightness(1.1)" 
+            : `grayscale(${grayscale.get()}) brightness(${brightness.get()})`
+        }}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <img 
+          src={card.img} 
+          alt={card.title}
+          className="w-full h-full object-cover"
+        />
+      </motion.div>
+
+      {/* Glow Effect / Shadow */}
+      <motion.div 
+        className="absolute inset-0 pointer-events-none"
+        animate={{
+          boxShadow: isHovered ? "inset 0 0 100px rgba(255,255,255,0.15)" : "inset 0 0 0px rgba(0,0,0,0)",
+        }}
+        transition={{ duration: 0.4 }}
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
-      
-      <div className="absolute inset-0 p-8 flex flex-col justify-end">
-        <motion.div
-          animate={{ y: isHovered ? -10 : 0 }}
-          transition={{ type: "spring", stiffness: 300, damping: 20 }}
-        >
-          <div className="flex items-center justify-between mb-3">
-            <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2 py-1 text-[9px] font-bold text-neutral-200 uppercase tracking-widest">
-              {icon}
-              {subtitle}
-            </span>
-          </div>
-          
-          <h3 className="text-2xl font-black tracking-tight text-white uppercase leading-none mb-4">{title}</h3>
-          
-          <AnimatePresence>
-            {isHovered && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                className="overflow-hidden"
-              >
-                <p className="text-[11px] text-zinc-400 font-bold tracking-widest uppercase leading-relaxed mb-4">
-                  {description}
-                </p>
-                <div className="flex items-center gap-2 text-white">
-                  <span className="text-[9px] font-black uppercase tracking-widest">Discover More</span>
-                  <Plus className="w-3 h-3" />
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </motion.div>
-      </div>
+
+      {/* Minimal State Overlay (Index Number) */}
+      <motion.div 
+        className="absolute inset-0 flex items-center justify-center pointer-events-none"
+        animate={{ opacity: isHovered ? 0 : 1 }}
+      >
+        <span className="text-4xl md:text-6xl font-black text-white/20 tracking-tighter">
+          0{card.id}
+        </span>
+      </motion.div>
+
+      {/* Detailed Content (Revealed on Hover/Touch) */}
+      <AnimatePresence>
+        {isHovered && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 z-20 flex flex-col items-center justify-center text-center p-8 bg-black/40 backdrop-blur-[2px]"
+          >
+            <motion.span 
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.1, duration: 0.4 }}
+              className="text-[10px] md:text-xs font-bold tracking-[0.5em] text-zinc-300 uppercase mb-4"
+            >
+              {card.subtitle}
+            </motion.span>
+            
+            <motion.h3 
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.4 }}
+              className="text-4xl md:text-6xl lg:text-7xl font-black tracking-tighter text-white uppercase leading-none mb-6"
+            >
+              {card.title}
+            </motion.h3>
+            
+            <motion.div 
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              transition={{ delay: 0.3, duration: 0.4 }}
+              className="w-16 h-[2px] bg-white mb-8 origin-center"
+            />
+            
+            <motion.p 
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.4, duration: 0.4 }}
+              className="text-[10px] md:text-xs lg:text-sm text-zinc-100 font-medium tracking-[0.3em] uppercase max-w-[300px] leading-relaxed"
+            >
+              {card.description}
+            </motion.p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Subtle indicator for active card (if focused by scroll but not hovered) */}
+      <motion.div 
+        className="absolute bottom-6 left-0 w-full flex justify-center pointer-events-none"
+        style={{ opacity: useTransform(progress, [start + 0.1, mid, end - 0.1], [0, 1, 0]) }}
+      >
+        <motion.div 
+          animate={{ scale: isHovered ? 0 : 1 }}
+          className="w-1 h-1 bg-white rounded-full shadow-[0_0_8px_white]"
+        />
+      </motion.div>
     </motion.div>
   );
 };

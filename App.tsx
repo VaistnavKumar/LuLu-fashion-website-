@@ -6,15 +6,19 @@ import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import DiscoveryCards from './components/DiscoveryCards';
 import CustomCursor from './components/CustomCursor';
+import ScrollToTop from './components/ScrollToTop';
 
 const App: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleLinkClick = (slug: string) => {
     setIsMenuOpen(false);
-    const element = document.getElementById(slug.toLowerCase());
+    const id = slug.toLowerCase();
+    const element = document.getElementById(id);
+    
     if (element) {
-      const offset = 80;
+      // For the campaign section which is very long, we scroll to its start
+      const offset = 0; 
       const bodyRect = document.body.getBoundingClientRect().top;
       const elementRect = element.getBoundingClientRect().top;
       const elementPosition = elementRect - bodyRect;
@@ -38,6 +42,7 @@ const App: React.FC = () => {
   return (
     <div className="relative min-h-screen bg-white">
       <CustomCursor />
+      <ScrollToTop />
       
       <Navbar 
         onMenuToggle={() => setIsMenuOpen(!isMenuOpen)} 
@@ -50,11 +55,12 @@ const App: React.FC = () => {
           <Hero />
         </div>
         
-        <div id="campaign">
+        {/* Cinematic Discovery Section */}
+        <div id="campaign" className="bg-white">
           <DiscoveryCards />
         </div>
 
-        {/* Brand Philosophy - Optimized for legibility */}
+        {/* Brand Philosophy */}
         <section className="bg-black text-white py-48 px-6 md:px-20 relative overflow-hidden">
           <div className="max-w-7xl mx-auto relative z-10">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">

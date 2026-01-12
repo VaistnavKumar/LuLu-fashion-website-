@@ -2,10 +2,10 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, X, Plus, MapPin, Instagram, Youtube, Twitter, ShoppingBag } from 'lucide-react';
-import Navbar from './components/Navbar.tsx';
-import Hero from './components/Hero.tsx';
-import DiscoveryCards from './components/DiscoveryCards.tsx';
-import CustomCursor from './components/CustomCursor.tsx';
+import Navbar from './components/Navbar';
+import Hero from './components/Hero';
+import DiscoveryCards from './components/DiscoveryCards';
+import CustomCursor from './components/CustomCursor';
 
 const App: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
